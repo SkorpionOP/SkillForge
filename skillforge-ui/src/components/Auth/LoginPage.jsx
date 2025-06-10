@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '@/firebase/firebaseConfig';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Mail } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 // Import your image, assuming you've renamed it to logo.png and it's in the same directory
 import SkillForgeLogo from './logo.png';
@@ -63,36 +61,9 @@ const Spinner = () => (
 );
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  const handleEmailPasswordLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // After successful Firebase login, ideally you'd also register/verify with your backend
-      // Similar to Google login, you'd get the ID token and send it.
-      // For now, navigating directly, but consider backend integration here too.
-      navigate('/');
-    } catch (err) {
-      console.error("Login error:", err);
-      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
-        setError("Invalid email or password.");
-      } else if (err.code === "auth/too-many-requests") {
-        setError("Too many login attempts. Please try again later.");
-      } else {
-        setError("Failed to login. Please check your credentials and try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleLogin = async () => {
     setError('');
@@ -156,9 +127,20 @@ export default function LoginPage() {
 
       {/* Content wrapper - relative z-index to be above the grid */}
       <div className="relative z-10 w-full max-w-md">
+        {/* Development Notice */}
+        <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
+          <div className="flex items-center gap-2 text-yellow-300">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="text-sm font-medium">Development Mode</span>
+          </div>
+          <p className="text-xs text-yellow-200/80 mt-1">
+            This application is currently in development. Some features may not work as expected.
+          </p>
+        </div>
+
         <Card className="w-full max-w-md border border-gray-900 bg-black">
           <CardHeader className="space-y-4 text-center">
-            {/* Replaced CardTitle with img tag */}
+            {/* Logo */}
             <div className="flex justify-center">
               <img
                 src={SkillForgeLogo}
@@ -193,71 +175,17 @@ export default function LoginPage() {
               )}
             </Button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-800" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-black px-2 text-neutral-300">OR</span>
-              </div>
+            <div className="text-center">
+              <p className="text-xs text-neutral-400">
+                Currently, only Google authentication is available.
+              </p>
             </div>
-
-            <form onSubmit={handleEmailPasswordLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-neutral-200">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="pl-9 bg-black border-gray-800 focus-visible:ring-gray-700 placeholder-neutral-500 text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-neutral-200">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pr-10 bg-black border-gray-800 focus-visible:ring-gray-700 placeholder-neutral-500 text-white"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white"
-              >
-                {loading ? (
-                  <Spinner />
-                ) : (
-                  <>
-                    <Mail className="mr-2 h-4 w-4" />
-                    LOGIN WITH EMAIL
-                  </>
-                )}
-              </Button>
-            </form>
           </CardContent>
 
           <CardFooter className="text-sm text-neutral-300 justify-center">
-            Don't have an account?{" "}
-            <Link to="/signup"
-              className="text-white px-1 h-auto underline underline-offset-4"
-            >
-              Sign Up
-            </Link>
+            <p className="text-center text-neutral-400">
+              New users will be automatically registered upon first login.
+            </p>
           </CardFooter>
         </Card>
       </div>
