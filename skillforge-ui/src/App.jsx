@@ -3,7 +3,7 @@ import React from 'react';
 import SkillForge from './Pages/skillForge';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'; // <--- ADDED useAuth import here
 import LoginPage from './components/Auth/LoginPage';
-import SignupPage from './components/Auth/SignUpPage';
+import SignUpPage from "./components/Auth/SignUpPage";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
