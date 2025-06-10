@@ -1,4 +1,3 @@
-
 // src/App.jsx
 import React from 'react';
 import SkillForge from './Pages/skillForge';
@@ -34,29 +33,29 @@ function AppRoutes() {
       {/* Public routes - only accessible when NOT logged in */}
       <Route 
         path="/login" 
-        element={currentUser ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
+        element={currentUser ? <Navigate to="/app" replace /> : <LoginPage />} 
       />
       <Route 
         path="/signup" 
-        element={currentUser ? <Navigate to="/dashboard" replace /> : <SignUpPage />} 
+        element={currentUser ? <Navigate to="/app" replace /> : <SignUpPage />} 
       />
       
       {/* Protected routes - only accessible when logged in */}
       <Route 
-        path="/dashboard" 
+        path="/app/*" 
         element={currentUser ? <SkillForge /> : <Navigate to="/login" replace />} 
       />
       
       {/* Root redirect */}
       <Route 
         path="/" 
-        element={<Navigate to={currentUser ? "/dashboard" : "/login"} replace />} 
+        element={<Navigate to={currentUser ? "/app" : "/login"} replace />} 
       />
       
       {/* Catch all - redirect to appropriate page */}
       <Route 
         path="*" 
-        element={<Navigate to={currentUser ? "/dashboard" : "/login"} replace />} 
+        element={<Navigate to={currentUser ? "/app" : "/login"} replace />} 
       />
     </Routes>
   );
