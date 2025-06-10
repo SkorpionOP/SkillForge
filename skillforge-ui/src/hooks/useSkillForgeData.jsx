@@ -140,14 +140,14 @@ export default function useSkillForgeData() {
     }[cat] || "border-gray-400/30 bg-gray-400/5");
 
   const getCategoryIcon = useCallback((category) => {
-    const icons = {
-      Foundation: <Database className="w-4 h-4" />,
-      Implementation: <Code className="w-4 h-4" />,
-      Advanced: <Settings className="w-4 h-4" />,
-      Mastery: <Brain className="w-4 h-4" />,
-    };
-    return icons[category] || <Circle className="w-4 h-4" />;
-  }, []);
+  const icons = {
+    Foundation: Database,  // Just the component, not JSX
+    Implementation: Code,
+    Advanced: Settings,
+    Mastery: Brain,
+  };
+  return icons[category] || Circle; // Return the component reference
+}, []);
 
   useEffect(() => {
     const loadInitialData = async () => {
