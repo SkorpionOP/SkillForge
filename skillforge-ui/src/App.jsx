@@ -30,32 +30,36 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public routes - only accessible when NOT logged in */}
+      {/* Public routes */}
       <Route 
         path="/login" 
-        element={currentUser ? <Navigate to="/app" replace /> : <LoginPage />} 
+        element={currentUser ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
       />
       <Route 
         path="/signup" 
-        element={currentUser ? <Navigate to="/app" replace /> : <SignUpPage />} 
+        element={currentUser ? <Navigate to="/dashboard" replace /> : <SignUpPage />} 
       />
       
-      {/* Protected routes - only accessible when logged in */}
+      {/* Protected routes - simplified structure */}
       <Route 
-        path="/app/*" 
+        path="/dashboard/*" 
+        element={currentUser ? <SkillForge /> : <Navigate to="/login" replace />} 
+      />
+      <Route 
+        path="/dashboard" 
         element={currentUser ? <SkillForge /> : <Navigate to="/login" replace />} 
       />
       
       {/* Root redirect */}
       <Route 
         path="/" 
-        element={<Navigate to={currentUser ? "/app" : "/login"} replace />} 
+        element={<Navigate to={currentUser ? "/dashboard" : "/login"} replace />} 
       />
       
-      {/* Catch all - redirect to appropriate page */}
+      {/* Catch all routes */}
       <Route 
         path="*" 
-        element={<Navigate to={currentUser ? "/app" : "/login"} replace />} 
+        element={currentUser ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} 
       />
     </Routes>
   );
