@@ -20,29 +20,39 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `Generate a detailed learning roadmap for "${skill}" over a period of "${duration}".
-  The roadmap should consist of 5-7 distinct tasks.
-  For each task, provide:
-  - a concise title (e.g., "Understand React Basics", "Set up Development Environment")
-  - a detailed description of what needs to be learned/done for this task
-  - an estimated XP value (between 50 and 200, based on complexity)
-  - an estimated time to complete (e.g., "2-3 hours", "1 day", "3 days")
-  The output should be a JSON array of task objects, formatted exactly as follows:
-  [
-    {
-      "title": "Task Title 1",
-      "description": "Detailed description of task 1.",
-      "xp": 100,
-      "estimatedTime": "2 days"
-    },
-    {
-      "title": "Task Title 2",
-      "description": "Detailed description of task 2.",
-      "xp": 150,
-      "estimatedTime": "1 week"
-    }
-  ]
-  Ensure the response is valid JSON and nothing else.`;
+The roadmap should consist of 5-7 distinct tasks divided into these categories: Foundation, Implementation, Advanced, and Mastery.
+For each task, provide:
+- a concise title (e.g., "Understand React Basics", "Set up Development Environment")
+- a detailed description of what needs to be learned/done for this task
+- an estimated XP value (between 50 and 200, based on complexity)
+- an estimated time to complete (e.g., "2-3 hours", "1 day", "3 days")
+- a category (one of: "Foundation", "Implementation", "Advanced", "Mastery")
 
+The output should be a JSON array of task objects, formatted exactly as follows:
+[
+  {
+    "title": "Task Title 1",
+    "description": "Detailed description of task 1.",
+    "xp": 100,
+    "estimatedTime": "2 days",
+    "category": "Foundation"
+  },
+  {
+    "title": "Task Title 2",
+    "description": "Detailed description of task 2.",
+    "xp": 150,
+    "estimatedTime": "1 week",
+    "category": "Implementation"
+  }
+]
+
+Additional guidelines:
+1. Start with 1-2 Foundation tasks (basic concepts/setup)
+2. Include 2-3 Implementation tasks (practical applications)
+3. Include 1-2 Advanced tasks (complex topics)
+4. Optionally include 1 Mastery task (expert-level challenge)
+5. Progress difficulty logically through the categories
+6. Ensure the response is valid JSON and nothing else.`;
   try {
     const result = await model.generateContent(prompt);
     const response = result.response;
