@@ -1,0 +1,7 @@
+{
+  "tasks": [
+    { "title": "Intro to HTML", "xp": 20, "completed": false },
+    { "title": "CSS Basics", "xp": 30, "completed": false },
+    { "title": "JavaScript Fundamentals", "xp": 50, "completed": false }
+  ]
+}
