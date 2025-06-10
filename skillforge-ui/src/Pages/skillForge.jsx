@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Database, Code, Settings, Brain, Circle,
 } from "lucide-react";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 
 import useSkillForgeData from "@/hooks/useSkillForgeData";
 import DashboardHeader from "@/components/SkillForge/DashboardHeader";
@@ -13,11 +14,12 @@ import CongratsModal from "@/components/SkillForge/CongratsModal";
 import { Loader } from "lucide-react";
 
 export default function SkillForge() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const {
     backendUser,
     currentUser,
-    currentView,
-    setCurrentView,
     roadmaps,
     activeRoadmaps,
     completedRoadmaps,
@@ -43,6 +45,57 @@ export default function SkillForge() {
     getCategoryColor,
     getCategoryIcon,
   } = useSkillForgeData();
+
+  // Enhanced navigation functions
+  const navigateToGenerator = () => {
+    navigate('/app/generator');
+    closeMobileMenu();
+  };
+
+  const navigateToRoadmapsList = () => {
+    navigate('/app/roadmaps');
+    closeMobileMenu();
+  };
+
+  const navigateToDashboard = (roadmapId) => {
+    if (roadmapId) {
+      navigate(`/app/dashboard/${roadmapId}`);
+    } else if (activeRoadmapId) {
+      navigate(`/app/dashboard/${activeRoadmapId}`);
+    } else {
+      navigate('/app/roadmaps');
+    }
+    closeMobileMenu();
+  };
+
+  const handleBackNavigation = () => {
+    if (location.pathname.includes('/generator')) {
+      // From generator, go back to roadmaps list or dashboard if there's an active roadmap
+      if (activeRoadmap) {
+        navigateToDashboard();
+      } else {
+        navigateToRoadmapsList();
+      }
+    } else if (location.pathname.includes('/dashboard')) {
+      // From dashboard, go back to roadmaps list
+      navigateToRoadmapsList();
+    }
+  };
+
+  // Enhanced roadmap selection with navigation
+  const handleSelectRoadmapWithNav = (roadmap) => {
+    handleSelectRoadmap(roadmap);
+    navigateToDashboard(roadmap.id);
+  };
+
+  // Enhanced roadmap generation with navigation
+  const generateRoadmapWithNav = async (data) => {
+    const result = await generateRoadmap(data);
+    if (result && result.roadmapId) {
+      navigateToDashboard(result.roadmapId);
+    }
+    return result;
+  };
 
   if (loading) {
     return (
@@ -72,10 +125,7 @@ export default function SkillForge() {
         <DashboardHeader
           user={backendUser}
           activeRoadmap={activeRoadmap}
-          onGenerateNew={() => {
-            setCurrentView("generator");
-            closeMobileMenu();
-          }}
+          onGenerateNew={navigateToGenerator}
           onToggleMobileMenu={toggleMobileMenu}
           onLogout={handleLogout}
         />
@@ -87,40 +137,83 @@ export default function SkillForge() {
           />
         )}
 
-        {currentView === "generator" ? (
-          <GeneratorForm
-            formData={formData}
-            setFormData={setFormData}
-            generateRoadmap={generateRoadmap}
-            loading={loading}
-            onBackToDashboard={() =>
-              setCurrentView(activeRoadmap ? "dashboard" : "roadmapsList")
+        <Routes>
+          {/* Generator Route */}
+          <Route 
+            path="/generator" 
+            element={
+              <GeneratorForm
+                formData={formData}
+                setFormData={setFormData}
+                generateRoadmap={generateRoadmapWithNav}
+                loading={loading}
+                onBackToDashboard={handleBackNavigation}
+              />
             }
           />
-        ) : currentView === "dashboard" && activeRoadmap ? (
-          <DashboardView
-            backendUser={backendUser}
-            activeRoadmap={activeRoadmap}
-            setCurrentView={setCurrentView}
-            setActiveRoadmapId={setActiveRoadmapId}
-            handleComplete={handleComplete}
-            getCategoryColor={getCategoryColor}
-            getCategoryIcon={(cat) =>
-              getCategoryIcon(cat, { Database, Code, Settings, Brain, Circle })
+          
+          {/* Dashboard Route with roadmap ID */}
+          <Route 
+            path="/dashboard/:roadmapId" 
+            element={
+              activeRoadmap ? (
+                <DashboardView
+                  backendUser={backendUser}
+                  activeRoadmap={activeRoadmap}
+                  setCurrentView={(view) => {
+                    if (view === 'roadmapsList') navigateToRoadmapsList();
+                    else if (view === 'generator') navigateToGenerator();
+                  }}
+                  setActiveRoadmapId={setActiveRoadmapId}
+                  handleComplete={handleComplete}
+                  getCategoryColor={getCategoryColor}
+                  getCategoryIcon={(cat) =>
+                    getCategoryIcon(cat, { Database, Code, Settings, Brain, Circle })
+                  }
+                />
+              ) : (
+                <Navigate to="/app/roadmaps" replace />
+              )
             }
           />
-        ) : (
-          <RoadmapListView
-            roadmaps={roadmaps}
-            activeRoadmaps={activeRoadmaps}
-            completedRoadmaps={completedRoadmaps}
-            activeRoadmapId={activeRoadmapId}
-            setCurrentView={setCurrentView}
-            closeMobileMenu={closeMobileMenu}
-            handleSelectRoadmap={handleSelectRoadmap}
-            handleDeleteRoadmap={handleDeleteRoadmap}
+          
+          {/* Roadmaps List Route */}
+          <Route 
+            path="/roadmaps" 
+            element={
+              <RoadmapListView
+                roadmaps={roadmaps}
+                activeRoadmaps={activeRoadmaps}
+                completedRoadmaps={completedRoadmaps}
+                activeRoadmapId={activeRoadmapId}
+                setCurrentView={(view) => {
+                  if (view === 'generator') navigateToGenerator();
+                  else if (view === 'dashboard') navigateToDashboard();
+                }}
+                closeMobileMenu={closeMobileMenu}
+                handleSelectRoadmap={handleSelectRoadmapWithNav}
+                handleDeleteRoadmap={handleDeleteRoadmap}
+              />
+            }
           />
-        )}
+          
+          {/* Default redirect */}
+          <Route 
+            path="/" 
+            element={
+              <Navigate 
+                to={activeRoadmap ? `/app/dashboard/${activeRoadmapId}` : "/app/roadmaps"} 
+                replace 
+              />
+            }
+          />
+          
+          {/* Catch all */}
+          <Route 
+            path="*" 
+            element={<Navigate to="/app/roadmaps" replace />} 
+          />
+        </Routes>
       </div>
 
       <MobileMenu
@@ -129,7 +222,11 @@ export default function SkillForge() {
         isMobileMenuOpen={isMobileMenuOpen}
         mobileMenuRef={mobileMenuRef}
         closeMobileMenu={closeMobileMenu}
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => {
+          if (view === 'generator') navigateToGenerator();
+          else if (view === 'roadmapsList') navigateToRoadmapsList();
+          else if (view === 'dashboard') navigateToDashboard();
+        }}
         handleLogout={handleLogout}
       />
     </div>
