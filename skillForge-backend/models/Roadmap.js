@@ -6,8 +6,13 @@ const TaskSchema = new mongoose.Schema({
   description: { type: String, required: true },
   xp: { type: Number, required: true },
   estimatedTime: { type: String, required: true },
-  completed: { type: Boolean, default: false }
-}, { _id: true }); // Ensure subdocuments get an _id
+  completed: { type: Boolean, default: false },
+  category: {  // ← Add this
+    type: String, 
+    enum: ['Foundation', 'Implementation', 'Advanced', 'Mastery'],
+    default: 'Foundation'
+  }
+}, { _id: true });
 
 const RoadmapSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
