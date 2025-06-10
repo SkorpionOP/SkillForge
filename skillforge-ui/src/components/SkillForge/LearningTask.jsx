@@ -15,16 +15,16 @@ export default function LearningTask({ task, handleComplete, getCategoryColor, g
         {/* Main layout: stacks vertically on mobile, horizontally on sm and up */}
         <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
           {/* Left Part: Icon, Title, Description, XP/Time */}
-          <div className="flex items-start gap-4 flex-grow"> {/* Use flex-grow to allow content to take space */}
+          <div className="flex items-start gap-4 flex-grow">
             <div className={`w-12 h-12 rounded-lg border ${getCategoryColor(task.category)} flex items-center justify-center flex-shrink-0`}>
-              {IconComponent}
+              {IconComponent && <IconComponent className="w-6 h-6" />}
             </div>
-            <div className="flex-1 min-w-0"> {/* min-w-0 ensures content can shrink */}
-              {/* Title and Category: stacks vertically on mobile, horizontally on sm and up */}
+            <div className="flex-1 min-w-0">
+              {/* Title and Category */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3 mb-2">
                 <h3 className={`text-lg font-medium ${
                   task.completed ? 'line-through text-gray-500' : 'text-white'
-                } leading-tight`}> {/* Added leading-tight */}
+                } leading-tight`}>
                   {task.title}
                 </h3>
                 <span className="text-xs font-mono text-gray-500 border border-white/10 px-2 py-1 rounded flex-shrink-0">
@@ -32,7 +32,7 @@ export default function LearningTask({ task, handleComplete, getCategoryColor, g
                 </span>
               </div>
               <p className="text-gray-400 text-sm mb-3 leading-relaxed">{task.description}</p>
-              {/* XP and Estimated Time: allows wrapping on very small screens */}
+              {/* XP and Estimated Time */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-mono text-gray-500">
                 <span className="flex items-center gap-1">
                   <Star className="w-3 h-3" />
