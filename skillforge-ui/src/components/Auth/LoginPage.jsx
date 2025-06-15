@@ -5,7 +5,7 @@ import { auth, googleProvider } from '@/firebase/firebaseConfig';
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from 'lucide-react';
-
+import AnimatedGridBackground from '../AnimatedBackground';
 // Import your image, assuming you've renamed it to logo.png and it's in the same directory
 import SkillForgeLogo from './logo.png';
 
@@ -120,6 +120,8 @@ export default function LoginPage() {
   };
 
   return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+      <AnimatedGridBackground />
     // Outer div for the grid background and flex centering
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
       {/* Subtle grid pattern overlay - positioned absolutely to cover the whole screen */}
@@ -189,6 +191,7 @@ export default function LoginPage() {
           </CardFooter>
         </Card>
       </div>
+    </div>
     </div>
   );
 }
