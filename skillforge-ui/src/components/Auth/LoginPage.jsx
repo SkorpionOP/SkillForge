@@ -6,15 +6,10 @@ import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from 'lucide-react';
 import AnimatedGridBackground from '../AnimatedBackground';
-// Import your image, assuming you've renamed it to logo.png and it's in the same directory
 import SkillForgeLogo from './logo.png';
 
-// --- IMPORTANT: Ensure your frontend .env is configured correctly for Vite/CRA ---
-// For Vite: VITE_BACKEND_API_URL=http://localhost:5000/api
-// For Create React App: REACT_APP_BACKEND_API_URL=http://localhost:5000/api
-const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000/api'; // Fallback added
+const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000/api';
 
-// Google SVG Icon
 const GoogleIcon = () => (
   <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
     <path
@@ -36,7 +31,6 @@ const GoogleIcon = () => (
   </svg>
 );
 
-// Spinner component
 const Spinner = () => (
   <svg
     className="animate-spin -ml-1 mr-2 h-4 w-4"
@@ -68,19 +62,16 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setError('');
     setLoading(true);
-
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-
       const idToken = await user.getIdToken();
 
-      // Call your backend's user registration/verification endpoint
       const response = await fetch(`${BACKEND_API_BASE_URL}/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`, // Send Firebase ID token to backend
+          'Authorization': `Bearer ${idToken}`,
         },
         body: JSON.stringify({
           uid: user.uid,
@@ -89,30 +80,25 @@ export default function LoginPage() {
         }),
       });
 
-      // Your backend returns 200 for 'user already registered' and 201 for 'new user registered'
-      // If response.ok is false, it means a non-2xx status was returned (e.g., 500 error)
       if (!response.ok) {
-        // Attempt to parse JSON error, but catch if it's not JSON (e.g., HTML 404 page)
         let errorData = {};
         try {
-            errorData = await response.json();
-        } catch (jsonErr) {
-            console.error("Failed to parse error response as JSON:", jsonErr);
-            throw new Error(`Server responded with non-JSON content. Status: ${response.status}`);
+          errorData = await response.json();
+        } catch {
+          throw new Error(`Server responded with non-JSON content. Status: ${response.status}`);
         }
         throw new Error(errorData.message || 'Failed to register user with backend.');
       }
 
-      navigate('/'); // Navigate to dashboard/home on success
+      navigate('/');
     } catch (err) {
       console.error("Google Login error:", err);
-      // Provide more specific error messages for clarity
       if (err.message && err.message.includes("Server responded with non-JSON")) {
-          setError("Server error: Received an unexpected response. Please check backend URL and server status.");
+        setError("Server error: Received an unexpected response. Please check backend URL and server status.");
       } else if (err.code === "auth/popup-closed-by-user") {
-          setError(""); // Clear error if popup was just closed by user
+        setError("");
       } else {
-          setError(err.message || "Failed to login with Google. Please try again.");
+        setError(err.message || "Failed to login with Google. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -122,14 +108,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
       <AnimatedGridBackground />
-    // Outer div for the grid background and flex centering
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Subtle grid pattern overlay - positioned absolutely to cover the whole screen */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] z-0"></div>
 
-      {/* Content wrapper - relative z-index to be above the grid */}
       <div className="relative z-10 w-full max-w-md">
-        {/* Development Notice */}
         <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
           <div className="flex items-center gap-2 text-yellow-300">
             <AlertTriangle className="h-4 w-4" />
@@ -142,18 +123,12 @@ export default function LoginPage() {
 
         <Card className="w-full max-w-md border border-gray-900 bg-black">
           <CardHeader className="space-y-4 text-center">
-            {/* Logo */}
             <div className="flex justify-center">
-              <img
-                src={SkillForgeLogo}
-                alt="SkillForge Logo"
-                className="h-40 w-40" // Adjust height and width as needed
-              />
+              <img src={SkillForgeLogo} alt="SkillForge Logo" className="h-40 w-40" />
             </div>
-            <p className="text-sm text-neutral-300">
-              Login to your account
-            </p>
+            <p className="text-sm text-neutral-300">Login to your account</p>
           </CardHeader>
+
           <CardContent className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-center bg-gray-900 rounded-lg">
@@ -167,14 +142,10 @@ export default function LoginPage() {
               variant="outline"
               className="w-full bg-black border-gray-800 hover:bg-gray-900 text-white"
             >
-              {loading ? (
-                <Spinner />
-              ) : (
-                <>
-                  <GoogleIcon />
-                  CONTINUE WITH GOOGLE
-                </>
-              )}
+              {loading ? <Spinner /> : <>
+                <GoogleIcon />
+                CONTINUE WITH GOOGLE
+              </>}
             </Button>
 
             <div className="text-center">
@@ -191,7 +162,6 @@ export default function LoginPage() {
           </CardFooter>
         </Card>
       </div>
-    </div>
     </div>
   );
 }
